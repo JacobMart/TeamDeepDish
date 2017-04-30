@@ -7,10 +7,29 @@ const PORT = 3040;
 var fs = require('fs');
 var http = require('http');
 var server = new http.Server(handleRequest);
+var io = require('socket.io')(server);
 
-//Start the server
-server.listen(PORT, function(){
-  console.log("Listening on port", PORT);
+// setup the websockets
+var connected = 0;
+io.on('connection', function(socket) {
+  console.log('came here');
+    var name = 'User ' + connected;
+    var color = 'gray';
+    connected++;
+
+    socket.on('message', function(text) {
+        io.emit('message', {
+            user: name,
+            text: text,
+            color: color
+        });
+    });
+
+    socket.on('color', function(newColor) {
+        color = newColor;
+    });
+
+    socket.emit('welcome', "Welcome, " + name + "!");
 });
 
 /** @function serveFile
@@ -47,11 +66,23 @@ function handleRequest(req, res) {
     case '/style.css':
       serveFile('public/style.css', 'text/css', req, res);
       break;
+    case '/simple-chat.css':
+      serveFile('public/simple-chat.css', 'text/css', req, res);
+      break;
     case '/script.js':
-      serveFile('public/script.js', 'text/css', req, res);
+      serveFile('public/script.js', 'text/js', req, res);
+      break;
+
+    case '/chess_game.js':
+      serveFile('public/chess_game.js',"text/js", req, res);
       break;
     default:
       res.statusCode = 404;
       res.end("Not found");
   }
 }
+
+//Start the server
+server.listen(PORT, function(){
+  console.log("Listening on port", PORT);
+});

@@ -1,0 +1,26 @@
+{
+  "name": "simple-chat",
+  "version": "1.0.0",
+  "description": "A simple chat engine example",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zombiepaladin/simple-chat.git"
+  },
+  "keywords": [
+    "chat",
+    "websockets"
+  ],
+  "author": "Nathan H. Bean",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zombiepaladin/simple-chat/issues"
+  },
+  "homepage": "https://github.com/zombiepaladin/simple-chat#readme",
+  "dependencies": {
+    "socket.io": "^1.7.3"
+  }
+}
