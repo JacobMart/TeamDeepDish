@@ -208,7 +208,7 @@ router.resource('/players', player); //New routing
 
 var migrate = require('./lib/migrate');
 
-
+console.log("dd");
 migrate(db, 'migrations', function(err){
 	console.log("arrive to migrate");
  // var server = new http.Server(function(req, res) {

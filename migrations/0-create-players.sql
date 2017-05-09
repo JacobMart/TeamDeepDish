@@ -1,6 +1,6 @@
 CREATE TABLE players (
   id INTEGER PRIMARY KEY,
-  playerName TEXT UNIQUE,
+  username TEXT UNIQUE, 
   cryptedPassword TEXT,
   salt TEXT,
   wins INTEGER,

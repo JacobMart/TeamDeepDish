@@ -4,7 +4,9 @@
   "description": "A simple chat engine example",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"migrate": "node scripts/migrate.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +24,6 @@
   "homepage": "https://github.com/zombiepaladin/simple-chat#readme",
   "dependencies": {
     "socket.io": "^1.7.3"
-  }
+  },
+  "devDependencies": {}
 }
