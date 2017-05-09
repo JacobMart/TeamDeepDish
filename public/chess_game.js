@@ -1,3 +1,5 @@
+$(function(){
+// This basically  keep track of the io port and the chat	
 var socket = io();
 
 socket.on('welcome', function(text) {
@@ -29,4 +31,5 @@ $('#chat-send').on('click', function() {
 $('#color').on('change', function() {
     var color = $(this).val();
     socket.emit('color', color);
+});
 });

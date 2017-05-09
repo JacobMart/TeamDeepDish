@@ -1,0 +1,9 @@
+.container-fluid {
+  height: 100%;
+  width: 100%;
+  background-color: white;
+}
+
+body {
+  background: lightsteelblue;
+}

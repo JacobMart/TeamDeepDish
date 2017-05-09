@@ -1,0 +1,11 @@
+#game {
+  position: relative;
+  margin-left: 35%;
+}
+
+canvas{
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 3px 3px 5px;
+  position: absolute;
+}
