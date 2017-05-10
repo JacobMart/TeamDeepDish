@@ -35,7 +35,11 @@ io.on('connection', function(socket) {
             color: color
         });
     });
-
+    socket.on('newBoard', function(text) {
+      io.emit('newBoard', {
+        text: text
+      })
+    });
     socket.on('color', function(newColor) {
         color = newColor;
     });

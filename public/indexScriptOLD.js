@@ -147,6 +147,11 @@ socket.on('welcome', function(text) {
     $('<li>').text(text).appendTo('#message-log');
 });
 
+socket.on('start', function() {
+  console.log("Someone started the game")
+  $('#board1').start;
+});
+
 socket.on('message', function(message) {
     var li = $('<li>')
         .css('color', message.color)

@@ -1,9 +1,22 @@
 $(function(){
-// This basically  keep track of the io port and the chat	
+// This basically  keep track of the io port and the chat
 var socket = io();
 
 socket.on('welcome', function(text) {
     $('<li>').text(text).appendTo('#message-log');
+});
+
+socket.on('start', function() {
+  console.log("Someone started the game")
+  $('#board').start;
+});
+
+socket.on('clear', function() {
+
+});
+
+socket.on('move', function() {
+
 });
 
 socket.on('message', function(message) {
