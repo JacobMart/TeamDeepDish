@@ -1,421 +1,223 @@
-$(function(){ // After the page load Run the javascript
-  var chessCanvas = $('#chessboard')[0];
-  var chessCtx = chessCanvas.getContext('2d');
-  var colors = ['black', 'white', 'red'];
-  var spaceSize = 63;
-
-  //Color the board
-  for(var i=0; i < 8; i++){
-    for(var j=0; j < 8; j++){
-      if((i % 2) != 0){
-        if((j % 2) != 0){
-          //Color white
-        }
-        else{
-          //Color black
-          chessCtx.fillStyle = colors[0];
-          chessCtx.fillRect(i*64, j*64, 64, 64);
-        }
-      }
-      else{
-        if((j % 2) != 0){
-          //Color black
-          chessCtx.fillStyle = colors[0];
-          chessCtx.fillRect(i*64, j*64, 64, 64);
-        }
-        else{
-          //Color white
-        }
-      }
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/** @function list
+ * Sends a list of all projects as a JSON array.
+ * @param {http.incomingRequest} req - the request object
+ * @param {http.serverResponse} res - the response object
+ * @param {sqlite3.Database} db - the database object
+ */
+function list(req, res, db) {
+  db.all("SELECT * FROM cars", [], function(err, cars){
+    if(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server Error")
     }
-  }
- 
-make_base();
-function make_base()
-{
-  base_image = new Image();
-  base_image.src = 'images/bpawn.png';
-  chessCtx.drawImage(base_image, 100, 100);
+    res.setHeader("Content-Type", "text/json");
+    res.end(JSON.stringify(cars));
+  });
 }
 
-}); // end of  document
+/** @function create
+ * Creates a new project and adds it to the database.
+ * @param {http.incomingRequest} req - the request object
+ * @param {http.serverResponse} res - the response object
+ * @param {sqlite3.Database} db - the database object
+ */
+function create(req, res, db) {
 
 
-/*function createPieces(pc){
-  var wp1 = {type: "pawn", color: "white", image: "./images/wpawn.png", x: 0, y: 6, hasMoved: false, moveNext: [[0,5], [0,4]]};
-  pc.push(wp1);
-  var wp2 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 1, y: 6, hasMoved: false, moveNext: [[1,5], [1,4]]};
-  pc.push(wp2);
-  var wp3 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 2, y: 6, hasMoved: false, moveNext: [[2,5], [2,4]]};
-  pc.push(wp3);
-  var wp4 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 3, y: 6, hasMoved: false, moveNext: [[3,5], [3,4]]};
-  pc.push(wp4);
-  var wp5 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 4, y: 6, hasMoved: false, moveNext: [[4,5], [4,4]]};
-  pc.push(wp5);
-  var wp6 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 5, y: 6, hasMoved: false, moveNext: [[5,5], [5,4]]};
-  pc.push(wp6);
-  var wp7 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 6, y: 6, hasMoved: false, moveNext: [[6,5], [6,4]]};
-  pc.push(wp7);
-  var wp8 = {type: "pawn", color: "white", image: "./../images/wpawn.png", x: 7, y: 6, hasMoved: false, moveNext: [[7,5], [7,4]]};
-  pc.push(wp8);
-  var wr1 = {type: "rook", color: "white", image: "./../images/wrook.png", x: 0, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wr1);
-  var wr2 = {type: "rook", color: "white", image: "./../images/wrook.png", x: 7, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wr2);
-  var wkn1 = {type: "knight", color: "white", image: "./../images/wknight.png", x: 1, y: 7, hasMoved: false, moveNext: [[0,5],[2,5]]};
-  pc.push(wkn1);
-  var wkn2 = {type: "knight", color: "white", image: "./../images/wknight.png", x: 6, y: 7, hasMoved: false, moveNext: [[5,5],[7,5]]};
-  pc.push(wkn2);
-  var wb1 = {type: "bishop", color: "white", image: "./../images/wbishop.png", x: 2, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wb1);
-  var wb2 = {type: "bishop", color: "white", image: "./../images/wbishop.png", x: 5, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wb2);
-  var wq = {type: "queen", color: "white", image: "./../images/wqueen.png", x: 3, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wq);
-  var wk = {type: "king", color: "white", image: "./../images/wking.png", x: 4, y: 7, hasMoved: false, moveNext: []};
-  pc.push(wk);
+//var  jsonData = JSON.stringify({filename:req.body.image.filename,carName:req.body.carName,year:req.body.year,description:req.body.description});
 
-  var bp1 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 0, y: 1, hasMoved: false, moveNext: [[0,2], [0,3]]};
-  pc.push(bp1);
-  var bp2 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 1, y: 1, hasMoved: false, moveNext: [[1,2], [1,3]]};
-  pc.push(bp2);
-  var bp3 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 2, y: 1, hasMoved: false, moveNext: [[2,2], [2,3]]};
-  pc.push(bp3);
-  var bp4 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 3, y: 1, hasMoved: false, moveNext: [[3,2], [3,3]]};
-  pc.push(bp4);
-  var bp5 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 4, y: 1, hasMoved: false, moveNext: [[4,2], [4,3]]};
-  pc.push(bp5);
-  var bp6 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 5, y: 1, hasMoved: false, moveNext: [[5,2], [5,3]]};
-  pc.push(bp6);
-  var bp7 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 6, y: 1, hasMoved: false, moveNext: [[6,2], [6,3]]};
-  pc.push(bp7);
-  var bp8 = {type: "pawn", color: "black", image: "./../images/bpawn.png", x: 7, y: 1, hasMoved: false, moveNext: [[7,2], [7,3]]};
-  pc.push(bp8);
-  var br1 = {type: "rook", color: "black", image: "./../images/brook.png", x: 0, y: 0, hasMoved: false, moveNext: []};
-  pc.push(br1);
-  var br2 = {type: "rook", color: "black", image: "./../images/brook.png", x: 7, y: 0, hasMoved: false, moveNext: []};
-  pc.push(br2);
-  var bkn1 = {type: "knight", color: "black", image: "./../images/bknight.png", x: 1, y: 0, hasMoved: false, moveNext: [[0,3],[2,3]]};
-  pc.push(bkn1);
-  var bkn2 = {type: "knight", color: "black", image: "./../images/bknight.png", x: 6, y: 0, hasMoved: false, moveNext: [[5,3],[7,3]]};
-  pc.push(bkn2);
-  var bb1 = {type: "bishop", color: "black", image: "./../images/bbishop.png", x: 2, y: 0, hasMoved: false, moveNext: []};
-  pc.push(bb1);
-  var bb2 = {type: "bishop", color: "black", image: "./../images/bbishop.png", x: 5, y: 0, hasMoved: false, moveNext: []};
-  pc.push(bb2);
-  var bq = {type: "queen", color: "black", image: "./../images/bqueen.png", x: 3, y: 0, hasMoved: false, moveNext: []};
-  pc.push(bq);
-  var bk = {type: "king", color: "black", image: "./../images/bking.png", x: 4, y: 0, hasMoved: false, moveNext: []};
-  pc.push(bk);
+    multipart(req, res, function(req, res){
 
-  return pc;
-}*/
+db.run("INSERT INTO cars (name, brand, year, description) VALUES (?,?,?,?)",
+[req.body.image.filename,req.body.carName, req.body.year, req.body.description],
+ function(err) {
+if(err) {
+ console.error(err);
+ res.statusCode = 500;
+ res.end("Could not insert project into database");
+ return;
+}
+res.statusCode = 200;
+res.end();
+ }
+);
+fs.writeFile('public/images/' + req.body.image.filename, req.body.image.data, function(err){
+ if(err) {
+console.error(err);
+res.statusCode = 500;
+res.statusMessage = "Server Error";
+res.end("Server Error");
+return;
+ }
+  });// end of mulitipart
+});
+}
 
-/**
-*/
-/*function drawPieces(bt){
-  var pieceCanvas = document.getElementById('gamepieces');
-
-  if(pieceCanvas.getContext){
-    pieceCtx = pieceCanvas.getContext('2d');
-
-
-
-  }
-
-
+/** @function read
+ * Serves a specific project as a JSON string
+ * @param {http.incomingRequest} req - the request object
+ * @param {http.serverResponse} res - the response object
+ * @param {sqlite3.Database} db - the database object
+ */
+function read(req, res, db) {
+  var id = req.params.id;
+  db.get("SELECT * FROM cars WHERE id=?", [id], function(err, project){
+    if(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server error");
+      return;
+    }
+    if(!project) {
+      res.statusCode = 404;
+      res.end("Project not found");
+      return;
+    }
+    res.setHeader("Content-Type", "text/json");
+    res.end(JSON.stringify(project));
+  });
 }
 
 
-*/
-/*	findMoves - determines what moves a given piece
-*		can take.
-*	Currently, the board is represented with board[x,y].
-*/
-/*function findMoves(piece) {
-	moves [];
-	x = piece.x;
-	y = piece.y;
-	switch (piece.type) {	//Each piece moves differently
+/** @update
+ * Updates a specific record with the supplied values
+ * @param {http.incomingRequest} req - the request object
+ * @param {http.serverResponse} res - the response object
+ * @param {sqlite3.Database} db - the database object
+ */
+function update(req, res, db) {
+  var id = req.params.id;
+  var body = "";
 
-		case "pawn":
-			if (piece.color == "white") {
-				//Checks for moving one space
-				if (board[x,y-1].checkSpace() == false) { //If space above is empty
-					moves.push([x,y-1]);
-					if (piece.hasMoved == false) {		//Unmoved pawns can move two spaces
-						if (board[x,y-2].checkSpace() == false) {
-							moves.push([x,y-2]);
-						}
-					}
-				}
-				//Checking if capturing a piece is possible
-				if (board[x-1,y-1].checkSpace()) {
-					//Look up piece in square [x-1,y-1], if type is "black" add move
-				}
-				if (board[x+1,y-1].checkSpace()) {
-					//Look up piece in square [x+1,y-1], if type is "black" add move
-				}
+  req.on("error", function(err){
+    console.error(err);
+    res.statusCode = 500;
+    res.end("Server error");
+  });
 
-			}
+  req.on("data", function(data){
+    body += data;
+  });
 
+  req.on("end", function() {
+    var project = JSON.parse(body);
+    db.run("UPDATE cars SET name=?, description=?, version=?, repository=?, license=? WHERE id=?",
+      [project.name, project.description, project.version, project.repository, project.license, id],
+      function(err) {
+        if(err) {
+          console.error(err);
+          res.statusCode = 500;
+          res.end("Could not update project in database");
+          return;
+        }
+        res.statusCode = 200;
+        res.end();
+      }
+    );
+  });
+}
 
-			else {	//black pawn
-				//Checks for moving one space
-				if (board[x,y+1].checkSpace() == false) { //If space above is empty
-					moves.push([x,y+1]);
-					if (piece.hasMoved == false) {		//Unmoved pawns can move two spaces
-						if (board[x,y+2].checkSpace() == false) {
-							moves.push([x,y+2]);
-						}
-					}
-				}
-				//Checking if capturing a piece is possible
-				if (board[x-1,y+1].checkSpace()) {
-					//Look up piece in square [x-1,y+1], if type is "white" add move
-				}
-				if (board[x+1,y+1].checkSpace()) {
-					//Look up piece in square [x+1,y+1], if type is "white" add move
-				}
-			}
-			break;
+/** @destroy
+ * Removes the specified project from the database.
+ * @param {http.incomingRequest} req - the request object
+ * @param {http.serverResponse} res - the response object
+ * @param {sqlite3.Database} db - the database object
+ */
+function destroy(req, res, db) {
+  var id = req.params.id;
+  db.run("DELETE FROM cars WHERE id=?", [id], function(err) {
+    if(err) {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Server error");
+    }
+    res.statusCode = 200;
+    res.end();
+  });
+}
 
-		case "knight":
-			if (piece.color == "white") {
-				//8 moves to check
-				//If square has a piece of similar color, don't add move
-				//Otherwise push to moves
+},{}],2:[function(require,module,exports){
+$(function(){
+// This basically  keep track of the io port and the chat
+var socket = io();
 
-				//[x-2,y+1]
-				//[x-1,y+2]
+socket.on('welcome', function(text) {
+    $('<li>').text(text).appendTo('#message-log');
+});
 
-				//[x+2,y+1]
-				//[x+1,y+2]
+socket.on('message', function(message) {
+    var li = $('<li>')
+        .css('color', message.color)
+        .appendTo('#message-log');
 
-				//[x-2,y-1]
-				//[x-1,y-2]
+    $('<strong>')
+        .text(message.user + ':')
+        .appendTo(li)
+        .css('padding-right', '1rem');
 
-				//[x+2,y-1]
-				//[x+1,y-2]
-			}
+    $('<span>')
+        .text(message.text)
+        .appendTo(li);
+});
 
-			// "black" knight
-			else {
-				//8 moves to check
-				//If square has a piece of similar color, don't add move
-				//Otherwise push to moves
+$('#chat-send').on('click', function() {
+  console.log('clicked');
+    var text = $('#chat-text').val();
+    socket.emit('message', text);
+    $('#chat-text').val('');
+});
 
-				//[x-2,y+1]
-				//[x-1,y+2]
+$('#color').on('change', function() {
+    var color = $(this).val();
+    socket.emit('color', color);
+});
+});
 
-				//[x+2,y+1]
-				//[x+1,y+2]
+},{}],3:[function(require,module,exports){
+/*! chessboard.js v0.3.0 | (c) 2013 Chris Oakman | MIT License chessboardjs.com/license */
+(function(){function l(f){return"string"!==typeof f?!1:-1!==f.search(/^[a-h][1-8]$/)}function Q(f){if("string"!==typeof f)return!1;f=f.replace(/ .+$/,"");f=f.split("/");if(8!==f.length)return!1;for(var b=0;8>b;b++)if(""===f[b]||8<f[b].length||-1!==f[b].search(/[^kqrbnpKQRNBP1-8]/))return!1;return!0}function F(f){if("object"!==typeof f)return!1;for(var b in f)if(!0===f.hasOwnProperty(b)){var n;(n=!0!==l(b))||(n=f[b],n="string"!==typeof n?!1:-1!==n.search(/^[bw][KQRNBP]$/),n=!0!==n);if(n)return!1}return!0}
+function K(f){if(!0!==Q(f))return!1;f=f.replace(/ .+$/,"");f=f.split("/");for(var b={},n=8,m=0;8>m;m++){for(var l=f[m].split(""),r=0,w=0;w<l.length;w++)if(-1!==l[w].search(/[1-8]/))var I=parseInt(l[w],10),r=r+I;else{var I=b,F=B[r]+n,A;A=l[w];A=A.toLowerCase()===A?"b"+A.toUpperCase():"w"+A.toUpperCase();I[F]=A;r++}n--}return b}function L(f){if(!0!==F(f))return!1;for(var b="",n=8,m=0;8>m;m++){for(var l=0;8>l;l++){var r=B[l]+n;!0===f.hasOwnProperty(r)?(r=f[r].split(""),r="w"===r[0]?r[1].toUpperCase():
+r[1].toLowerCase(),b+=r):b+="1"}7!==m&&(b+="/");n--}b=b.replace(/11111111/g,"8");b=b.replace(/1111111/g,"7");b=b.replace(/111111/g,"6");b=b.replace(/11111/g,"5");b=b.replace(/1111/g,"4");b=b.replace(/111/g,"3");return b=b.replace(/11/g,"2")}var B="abcdefgh".split("");window.ChessBoard=window.ChessBoard||function(f,b){function n(){return"xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx-xxxx".replace(/x/g,function(a){return(16*Math.random()|0).toString(16)})}function m(a){return JSON.parse(JSON.stringify(a))}function X(a){a=
+a.split(".");return{major:parseInt(a[0],10),minor:parseInt(a[1],10),patch:parseInt(a[2],10)}}function r(a,e,c){if(!0===b.hasOwnProperty("showErrors")&&!1!==b.showErrors){var d="ChessBoard Error "+a+": "+e;"console"===b.showErrors&&"object"===typeof console&&"function"===typeof console.log?(console.log(d),2<=arguments.length&&console.log(c)):"alert"===b.showErrors?(c&&(d+="\n\n"+JSON.stringify(c)),window.alert(d)):"function"===typeof b.showErrors&&b.showErrors(a,e,c)}}function w(a){return"fast"===
+a||"slow"===a?!0:parseInt(a,10)+""!==a+""?!1:0<=a}function I(){for(var a=0;a<B.length;a++)for(var b=1;8>=b;b++){var c=B[a]+b;s[c]=c+"-"+n()}b="KQRBNP".split("");for(a=0;a<b.length;a++){var c="w"+b[a],d="b"+b[a];M[c]=c+"-"+n();M[d]=d+"-"+n()}}function ga(){var a='<div class="'+h.chessboard+'">';!0===b.sparePieces&&(a+='<div class="'+h.sparePieces+" "+h.sparePiecesTop+'"></div>');a+='<div class="'+h.board+'"></div>';!0===b.sparePieces&&(a+='<div class="'+h.sparePieces+" "+h.sparePiecesBottom+'"></div>');
+return a+"</div>"}function A(a){"black"!==a&&(a="white");var e="",c=m(B),d=8;"black"===a&&(c.reverse(),d=1);for(var C="white",f=0;8>f;f++){for(var e=e+('<div class="'+h.row+'">'),k=0;8>k;k++){var g=c[k]+d,e=e+('<div class="'+h.square+" "+h[C]+" square-"+g+'" style="width: '+p+"px; height: "+p+'px" id="'+s[g]+'" data-square="'+g+'">');if(!0===b.showNotation){if("white"===a&&1===d||"black"===a&&8===d)e+='<div class="'+h.notation+" "+h.alpha+'">'+c[k]+"</div>";0===k&&(e+='<div class="'+h.notation+" "+
+h.numeric+'">'+d+"</div>")}e+="</div>";C="white"===C?"black":"white"}e+='<div class="'+h.clearfix+'"></div></div>';C="white"===C?"black":"white";"white"===a?d--:d++}return e}function Y(a){if("function"===typeof b.pieceTheme)return b.pieceTheme(a);if("string"===typeof b.pieceTheme)return b.pieceTheme.replace(/{piece}/g,a);r(8272,"Unable to build image source for cfg.pieceTheme.");return""}function D(a,b,c){var d='<img src="'+Y(a)+'" ';c&&"string"===typeof c&&(d+='id="'+c+'" ');d+='alt="" class="'+
+h.piece+'" data-piece="'+a+'" style="width: '+p+"px;height: "+p+"px;";!0===b&&(d+="display:none;");return d+'" />'}function N(a){var b="wK wQ wR wB wN wP".split(" ");"black"===a&&(b="bK bQ bR bB bN bP".split(" "));a="";for(var c=0;c<b.length;c++)a+=D(b[c],!1,M[b[c]]);return a}function ha(a,e,c,d){a=$("#"+s[a]);var C=a.offset(),f=$("#"+s[e]);e=f.offset();var k=n();$("body").append(D(c,!0,k));var g=$("#"+k);g.css({display:"",position:"absolute",top:C.top,left:C.left});a.find("."+h.piece).remove();g.animate(e,
+{duration:b.moveSpeed,complete:function(){f.append(D(c));g.remove();"function"===typeof d&&d()}})}function ia(a,e,c){var d=$("#"+M[a]).offset(),f=$("#"+s[e]);e=f.offset();var g=n();$("body").append(D(a,!0,g));var k=$("#"+g);k.css({display:"",position:"absolute",left:d.left,top:d.top});k.animate(e,{duration:b.moveSpeed,complete:function(){f.find("."+h.piece).remove();f.append(D(a));k.remove();"function"===typeof c&&c()}})}function ja(a,e,c){function d(){f++;if(f===a.length&&(G(),!0===b.hasOwnProperty("onMoveEnd")&&
+"function"===typeof b.onMoveEnd))b.onMoveEnd(m(e),m(c))}for(var f=0,g=0;g<a.length;g++)"clear"===a[g].type&&$("#"+s[a[g].square]+" ."+h.piece).fadeOut(b.trashSpeed,d),"add"===a[g].type&&!0!==b.sparePieces&&$("#"+s[a[g].square]).append(D(a[g].piece,!0)).find("."+h.piece).fadeIn(b.appearSpeed,d),"add"===a[g].type&&!0===b.sparePieces&&ia(a[g].piece,a[g].square,d),"move"===a[g].type&&ha(a[g].source,a[g].destination,a[g].piece,d)}function ka(a,b){a=a.split("");var c=B.indexOf(a[0])+1,d=parseInt(a[1],10);
+b=b.split("");var g=B.indexOf(b[0])+1,f=parseInt(b[1],10),c=Math.abs(c-g),d=Math.abs(d-f);return c>=d?c:d}function la(a){for(var b=[],c=0;8>c;c++)for(var d=0;8>d;d++){var g=B[c]+(d+1);a!==g&&b.push({square:g,distance:ka(a,g)})}b.sort(function(a,b){return a.distance-b.distance});a=[];for(c=0;c<b.length;c++)a.push(b[c].square);return a}function G(){x.find("."+h.piece).remove();for(var a in g)!0===g.hasOwnProperty(a)&&$("#"+s[a]).append(D(g[a]))}function R(){x.html(A(u));G();!0===b.sparePieces&&("white"===
+u?(S.html(N("black")),T.html(N("white"))):(S.html(N("white")),T.html(N("black"))))}function O(a){var e=m(g),c=m(a),d=L(e),f=L(c);if(d!==f){if(!0===b.hasOwnProperty("onChange")&&"function"===typeof b.onChange)b.onChange(e,c);g=a}}function U(a,b){for(var c in J)if(!0===J.hasOwnProperty(c)){var d=J[c];if(a>=d.left&&a<d.left+p&&b>=d.top&&b<d.top+p)return c}return"offboard"}function V(){x.find("."+h.square).removeClass(h.highlight1+" "+h.highlight2)}function ma(){function a(){G();y.css("display","none");
+if(!0===b.hasOwnProperty("onSnapbackEnd")&&"function"===typeof b.onSnapbackEnd)b.onSnapbackEnd(E,t,m(g),u)}if("spare"===t)Z();else{V();var e=$("#"+s[t]).offset();y.animate(e,{duration:b.snapbackSpeed,complete:a});z=!1}}function Z(){V();var a=m(g);delete a[t];O(a);G();y.fadeOut(b.trashSpeed);z=!1}function na(a){V();var e=m(g);delete e[t];e[a]=E;O(e);e=$("#"+s[a]).offset();y.animate(e,{duration:b.snapSpeed,complete:function(){G();y.css("display","none");if(!0===b.hasOwnProperty("onSnapEnd")&&"function"===
+typeof b.onSnapEnd)b.onSnapEnd(t,a,E)}});z=!1}function P(a,e,c,d){if("function"!==typeof b.onDragStart||!1!==b.onDragStart(a,e,m(g),u)){z=!0;E=e;t=a;H="spare"===a?"offboard":a;J={};for(var f in s)!0===s.hasOwnProperty(f)&&(J[f]=$("#"+s[f]).offset());y.attr("src",Y(e)).css({display:"",position:"absolute",left:c-p/2,top:d-p/2});"spare"!==a&&$("#"+s[a]).addClass(h.highlight1).find("."+h.piece).css("display","none")}}function aa(a,e){y.css({left:a-p/2,top:e-p/2});var c=U(a,e);if(c!==H){!0===l(H)&&$("#"+
+s[H]).removeClass(h.highlight2);!0===l(c)&&$("#"+s[c]).addClass(h.highlight2);if("function"===typeof b.onDragMove)b.onDragMove(c,H,t,E,m(g),u);H=c}}function ba(a){var e="drop";"offboard"===a&&"snapback"===b.dropOffBoard&&(e="snapback");"offboard"===a&&"trash"===b.dropOffBoard&&(e="trash");if(!0===b.hasOwnProperty("onDrop")&&"function"===typeof b.onDrop){var c=m(g);"spare"===t&&!0===l(a)&&(c[a]=E);!0===l(t)&&"offboard"===a&&delete c[t];!0===l(t)&&!0===l(a)&&(delete c[t],c[a]=E);var d=m(g),c=b.onDrop(t,
+a,E,c,d,u);if("snapback"===c||"trash"===c)e=c}"snapback"===e?ma():"trash"===e?Z():"drop"===e&&na(a)}function oa(a){a.preventDefault()}function pa(a){if(!0===b.draggable){var e=$(this).attr("data-square");!0===l(e)&&!0===g.hasOwnProperty(e)&&P(e,g[e],a.pageX,a.pageY)}}function qa(a){if(!0===b.draggable){var e=$(this).attr("data-square");!0===l(e)&&!0===g.hasOwnProperty(e)&&(a=a.originalEvent,P(e,g[e],a.changedTouches[0].pageX,a.changedTouches[0].pageY))}}function ra(a){if(!0===b.sparePieces){var e=
+$(this).attr("data-piece");P("spare",e,a.pageX,a.pageY)}}function sa(a){if(!0===b.sparePieces){var e=$(this).attr("data-piece");a=a.originalEvent;P("spare",e,a.changedTouches[0].pageX,a.changedTouches[0].pageY)}}function ca(a){!0===z&&aa(a.pageX,a.pageY)}function ta(a){!0===z&&(a.preventDefault(),aa(a.originalEvent.changedTouches[0].pageX,a.originalEvent.changedTouches[0].pageY))}function da(a){!0===z&&(a=U(a.pageX,a.pageY),ba(a))}function ua(a){!0===z&&(a=U(a.originalEvent.changedTouches[0].pageX,
+a.originalEvent.changedTouches[0].pageY),ba(a))}function va(a){if(!1===z&&(!0===b.hasOwnProperty("onMouseoverSquare")&&"function"===typeof b.onMouseoverSquare)&&(a=$(a.currentTarget).attr("data-square"),!0===l(a))){var e=!1;!0===g.hasOwnProperty(a)&&(e=g[a]);b.onMouseoverSquare(a,e,m(g),u)}}function wa(a){if(!1===z&&(!0===b.hasOwnProperty("onMouseoutSquare")&&"function"===typeof b.onMouseoutSquare)&&(a=$(a.currentTarget).attr("data-square"),!0===l(a))){var e=!1;!0===g.hasOwnProperty(a)&&(e=g[a]);
+b.onMouseoutSquare(a,e,m(g),u)}}function xa(){$("body").on("mousedown mousemove","."+h.piece,oa);x.on("mousedown","."+h.square,pa);v.on("mousedown","."+h.sparePieces+" ."+h.piece,ra);x.on("mouseenter","."+h.square,va);x.on("mouseleave","."+h.square,wa);!0===(navigator&&navigator.userAgent&&-1!==navigator.userAgent.search(/MSIE/))?(document.ondragstart=function(){return!1},$("body").on("mousemove",ca),$("body").on("mouseup",da)):($(window).on("mousemove",ca),$(window).on("mouseup",da));!0==="ontouchstart"in
+document.documentElement&&(x.on("touchstart","."+h.square,qa),v.on("touchstart","."+h.sparePieces+" ."+h.piece,sa),$(window).on("touchmove",ta),$(window).on("touchend",ua))}function ya(){v.html(ga());x=v.find("."+h.board);!0===b.sparePieces&&(S=v.find("."+h.sparePiecesTop),T=v.find("."+h.sparePiecesBottom));var a=n();$("body").append(D("wP",!0,a));y=$("#"+a);ea=parseInt(x.css("borderLeftWidth"),10);q.resize()}b=b||{};var fa=K("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"),h={alpha:"alpha-d2270",black:"black-3c85d",
+board:"board-b72b1",chessboard:"chessboard-63f37",clearfix:"clearfix-7da63",highlight1:"highlight1-32417",highlight2:"highlight2-9c5d2",notation:"notation-322f9",numeric:"numeric-fc462",piece:"piece-417db",row:"row-5277c",sparePieces:"spare-pieces-7492f",sparePiecesBottom:"spare-pieces-bottom-ae20f",sparePiecesTop:"spare-pieces-top-4028b",square:"square-55d63",white:"white-1e1d7"},v,x,y,S,T,q={},ea=2,u="white",g={},p,E,H,t,z=!1,M={},s={},J;q.clear=function(a){q.position({},a)};q.destroy=function(){v.html("");
+y.remove();v.unbind()};q.fen=function(){return q.position("fen")};q.flip=function(){q.orientation("flip")};q.move=function(){if(0!==arguments.length){for(var a=!0,b={},c=0;c<arguments.length;c++)if(!1===arguments[c])a=!1;else{var d;d=arguments[c];"string"!==typeof d?d=!1:(d=d.split("-"),d=2!==d.length?!1:!0===l(d[0])&&!0===l(d[1]));!0!==d?r(2826,"Invalid move passed to the move method.",arguments[c]):(d=arguments[c].split("-"),b[d[0]]=d[1])}var c=g,c=m(c),f;for(f in b)!0===b.hasOwnProperty(f)&&!0===
+c.hasOwnProperty(f)&&(d=c[f],delete c[f],c[b[f]]=d);b=c;q.position(b,a);return b}};q.orientation=function(a){if(0===arguments.length)return u;"white"===a||"black"===a?(u=a,R()):"flip"===a?(u="white"===u?"black":"white",R()):r(5482,"Invalid value passed to the orientation method.",a)};q.position=function(a,b){if(0===arguments.length)return m(g);if("string"===typeof a&&"fen"===a.toLowerCase())return L(g);!1!==b&&(b=!0);"string"===typeof a&&"start"===a.toLowerCase()&&(a=m(fa));!0===Q(a)&&(a=K(a));if(!0!==
+F(a))r(6482,"Invalid value passed to the position method.",a);else if(!0===b){var c=g,d=a,c=m(c),d=m(d),f=[],h={},k;for(k in d)!0===d.hasOwnProperty(k)&&(!0===c.hasOwnProperty(k)&&c[k]===d[k])&&(delete c[k],delete d[k]);for(k in d)if(!0===d.hasOwnProperty(k)){var l;a:{l=c;for(var n=d[k],s=la(k),p=0;p<s.length;p++){var q=s[p];if(!0===l.hasOwnProperty(q)&&l[q]===n){l=q;break a}}l=!1}!1!==l&&(f.push({type:"move",source:l,destination:k,piece:d[k]}),delete c[l],delete d[k],h[k]=!0)}for(k in d)!0===d.hasOwnProperty(k)&&
+(f.push({type:"add",square:k,piece:d[k]}),delete d[k]);for(k in c)!0===c.hasOwnProperty(k)&&!0!==h.hasOwnProperty(k)&&(f.push({type:"clear",square:k,piece:c[k]}),delete c[k]);ja(f,g,a);O(a)}else O(a),G()};q.resize=function(){var a=parseInt(v.css("width"),10);if(!a||0>=a)p=0;else{for(a-=1;0!==a%8&&0<a;)a--;p=a/8}x.css("width",8*p+"px");y.css({height:p,width:p});!0===b.sparePieces&&v.find("."+h.sparePieces).css("paddingLeft",p+ea+"px");R()};q.start=function(a){q.position("start",a)};var W;if(W=!0===
+function(){if("string"===typeof f){if(""===f)return window.alert("ChessBoard Error 1001: The first argument to ChessBoard() cannot be an empty string.\n\nExiting..."),!1;var a=document.getElementById(f);if(!a)return window.alert('ChessBoard Error 1002: Element with id "'+f+'" does not exist in the DOM.\n\nExiting...'),!1;v=$(a)}else if(v=$(f),1!==v.length)return window.alert("ChessBoard Error 1003: The first argument to ChessBoard() must be an ID or a single DOM node.\n\nExiting..."),!1;if(!window.JSON||
+"function"!==typeof JSON.stringify||"function"!==typeof JSON.parse)return window.alert("ChessBoard Error 1004: JSON does not exist. Please include a JSON polyfill.\n\nExiting..."),!1;if(a=typeof window.$)if(a=$.fn)if(a=$.fn.jquery)var a=$.fn.jquery,b="1.7.0",a=X(a),b=X(b),a=!0===1E8*a.major+1E4*a.minor+a.patch>=1E8*b.major+1E4*b.minor+b.patch;return a?!0:(window.alert("ChessBoard Error 1005: Unable to find a valid version of jQuery. Please include jQuery 1.7.0 or higher on the page.\n\nExiting..."),
+!1)}()){if("string"===typeof b||!0===F(b))b={position:b};"black"!==b.orientation&&(b.orientation="white");u=b.orientation;!1!==b.showNotation&&(b.showNotation=!0);!0!==b.draggable&&(b.draggable=!1);"trash"!==b.dropOffBoard&&(b.dropOffBoard="snapback");!0!==b.sparePieces&&(b.sparePieces=!1);!0===b.sparePieces&&(b.draggable=!0);if(!0!==b.hasOwnProperty("pieceTheme")||"string"!==typeof b.pieceTheme&&"function"!==typeof b.pieceTheme)b.pieceTheme="img/chesspieces/wikipedia/{piece}.png";if(!0!==b.hasOwnProperty("appearSpeed")||
+!0!==w(b.appearSpeed))b.appearSpeed=200;if(!0!==b.hasOwnProperty("moveSpeed")||!0!==w(b.moveSpeed))b.moveSpeed=200;if(!0!==b.hasOwnProperty("snapbackSpeed")||!0!==w(b.snapbackSpeed))b.snapbackSpeed=50;if(!0!==b.hasOwnProperty("snapSpeed")||!0!==w(b.snapSpeed))b.snapSpeed=25;if(!0!==b.hasOwnProperty("trashSpeed")||!0!==w(b.trashSpeed))b.trashSpeed=100;!0===b.hasOwnProperty("position")&&("start"===b.position?g=m(fa):!0===Q(b.position)?g=K(b.position):!0===F(b.position)?g=m(b.position):r(7263,"Invalid value passed to config.position.",
+b.position));W=!0}W&&(I(),ya(),xa());return q};window.ChessBoard.fenToObj=K;window.ChessBoard.objToFen=L})();
+},{}],4:[function(require,module,exports){
+require('./chess_game.js');
+require('./chess.js');
+require('./chessboard-0.3.0.min.js');
 
-				//[x-2,y-1]
-				//[x-1,y-2]
+var board1 = ChessBoard('board1', {
+draggable: true,
+dropOffBoard: 'trash',
+sparePieces: true
+});
+$('#startBtn').on('click', board1.start);
+$('#clearBtn').on('click', board1.clear);
 
-				//[x+2,y-1]
-				//[x+1,y-2]
-			}
-			break;
-
-		case "bishop":
-			checkDiagonals(piece);
-			break;
-
-		case "rook":
-			checkLines(piece);
-			break;
-
-		case "queen":
-			checkDiagonals(piece);
-			checkLines(piece);
-			break;
-
-		case "king":
-			if (piece.color == "white") {
-				//8 moves to check
-				//If square has a piece of similar color, don't add move
-				//Otherwise push to moves
-
-				//[x-1,y-1]
-				//[x,y-1]
-				//[x+1,y-1]
-
-				//[x-1,y]
-				//[x+1,y]
-
-				//[x-1,y+1]
-				//[x,y+1]
-				//[x+1,y+1]
-			}
-			else {
-				//8 moves to check
-				//If square has a piece of similar color, don't add move
-				//Otherwise push to moves
-
-				//[x-1,y-1]
-				//[x,y-1]
-				//[x+1,y-1]
-
-				//[x-1,y]
-				//[x+1,y]
-
-				//[x-1,y+1]
-				//[x,y+1]
-				//[x+1,y+1]
-			}
-			break
-	}
-	piece.moveNext = moves;
-}*/
-
-/*	checkDiagonals - checks the four diagonals lines
-*		of movement for available spaces.
-*		Called by bishops and queens.
-*/
-
-/*function checkDiagonals(piece) {
-	//Values of x and y that we can modify safely
-	currX = x;
-	currY = y;
-	stop = false; // Exits the loop if the bishop cannot move further
-	color = piece.color;
-	moves = [];
-
-	//UpLeft checks
-	while (stop == false && currX > 0 && currY > 0) {
-		if (board[currX-1,currY-1].checkSpace() == false) {
-			moves.push([currX-1,currY-1]);
-		}
-		else {
-			//Look up piece in square [currX-1, currY-1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX--;
-		currY--;
-	}
-	currX = x;
-	currY = y;
-	stop = false;
-
-	//UpRight checks
-	while (stop == false && currX < 7 && currY > 0) {
-		if (board[currX+1,currY-1].checkSpace() == false) {
-			moves.push([currX+1,currY-1]);
-		}
-		else {
-			//Look up piece in square [currX+1, currY-1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX++;
-		currY--;
-	}
-	currX = x;
-	currY = y;
-	stop = false;
-
-	//DownLeft checks
-	while (stop == false && currX > 0 && currY < 7) {
-		if (board[currX-1,currY+1].checkSpace() == false) {
-			moves.push([currX-1,currY+1]);
-		}
-		else {
-			//Look up piece in square [currX-1, currY+1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX--;
-		currY++;
-	}
-	currX = x;
-	currY = y;
-	stop = false;
-
-	//DownRight checks
-	while (stop == false && currX < 7 && currY < 7) {
-		if (board[currX+1,currY+1].checkSpace() == false) {
-			moves.push([currX+1,currY+1]);
-		}
-		else {
-			//Look up piece in square [currX+1, currY+1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX++;
-		currY++;
-	}
-	piece.moveNext = moves;
-}*/
-
-/*	checkLines - checks the four main directional lines
-*		of movement for available spaces.
-*		Called by rooks and queens.
-*/
-/*function checkLines(piece) {
-	//Values of x and y that we can modify safely
-	currX = x;
-	currY = y;
-	stop = false; // Exits the loop if the bishop cannot move further
-	color = piece.color
-
-	//Up checks
-	while (stop == false && currY > 0) {
-		if (board[x,currY-1].checkSpace() == false) {
-			moves.push([x,currY-1]);
-		}
-		else {
-			//Look up piece in square [x-1, currY-1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currY--;
-	}
-	currY = y;
-	stop = false;
-
-	//Right checks
-	while (stop == false && currX < 7) {
-		if (board[currX+1,y].checkSpace() == false) {
-			moves.push([currX+1,y]);
-		}
-		else {
-			//Look up piece in square [currX+1,y],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX++;
-	}
-	currX = x;
-	stop = false;
-
-	//Down checks
-	while (stop == false && && currY < 7) {
-		if (board[x,currY+1].checkSpace() == false) {
-			moves.push([x,currY+1]);
-		}
-		else {
-			//Look up piece in square [x, currY+1],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currY++;
-	}
-	stop = false;
-
-	//Left checks
-	while (stop == false && currX > 0) {
-		if (board[currX-1,y].checkSpace() == false) {
-			moves.push([currX-1,y]);
-		}
-		else {
-			//Look up piece in square [currX-1,y],
-			//	if that piece != color, add move, otherwise do not add move.
-			stop = true;
-		}
-		currX--;
-	}
-	piece.moveNext = moves;
-}*/
+},{"./chess.js":1,"./chess_game.js":2,"./chessboard-0.3.0.min.js":3}]},{},[4]);

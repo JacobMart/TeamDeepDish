@@ -6,6 +6,7 @@ const PORT = 3040;
 //global variables
 var fs = require('fs');
 var http = require('http');
+var express = require('express');
 var encryption = require('./lib/encryption');
 var urlencoded = require('./lib/form-urlencoded');
 var parseCookie = require('./lib/cookie-parser');
@@ -14,6 +15,7 @@ var db = new sqlite3.Database('scrumtastic.sqlite3', function(err) {
   if(err) console.error(err);
 });
 var router = new (require('./lib/route')).Router(db);
+router = express();
 var server = new http.Server(handleRequest);
 var io = require('socket.io')(server);
 var car = require('./src/resource/player');
@@ -40,6 +42,8 @@ io.on('connection', function(socket) {
 
     socket.emit('welcome', "Welcome, " + name + "!");
 });
+
+router.use(express.static('public'));
 
 //serving image
 router.get('/images/:filename',function(req, res){
@@ -116,7 +120,6 @@ if(cookie) {
   switch(req.url) {
     case '/':
     case '/login':
-    case '/login.html':
         if(req.method == 'GET') {
           // For GET requests, serve the login page
           fs.readFile('public/login.html', function(err, data){
@@ -148,7 +151,7 @@ if(cookie) {
             } else {
               // Not a username/password match, redirect to
               res.statusCode = 302;
-              res.setHeader("Location", "/login.html");
+              res.setHeader("Location", "/login");
               res.end();
             }
           });
@@ -163,9 +166,13 @@ if(cookie) {
       }
       break;
     case '/index.html':
-      loginRequired(req, res, function(req,res){
-        serveFile('public/index.html', 'text/html', req, res);
-      });
+      serveFile('public/chessboardjs-0.3.0/index.html', 'text/html', req, res);
+      break;
+    case '/chessboard-0.3.0-min.js':
+      serveFile('public/chessboardjs-0.3.0/chessboard-0.3.0-min.js', 'text/js', req, res);
+      break;
+    case '/chessboard-0.3.0-min.css':
+      serveFile('public/chessboardjs-0.3.0/css/chessboard-0.3.0-min.css', 'text/css', req, res);
       break;
   //  case '/socket.io/socket.io.js':
   //      serverFile('');
@@ -182,21 +189,13 @@ if(cookie) {
      serveFile('public/indexStyle.css', 'text/css', req, res);
      break;
     case '/indexScript.js':
-     serveFile('public/indexScript.js', 'text/css', req, res);
+     serveFile('public/chessboardjs-0.3.0/indexScript.js', 'text/css', req, res);
      break;
      case '/chess_game.js':
       serveFile('public/chess_game.js',"text/js", req, res);
       break;
-    case '/logout':
-      // Clear the session by flushing its value
-      res.setHeader("Set-Cookie", ["cryptsession="]);
-      // Redirect back to the index
-      res.statusCode = 302;
-      res.setHeader("Location", "/login.html");
-      res.end();
-      break;
     default:
-		router.route(req,res);
+		router(req,res);
   }
 
 }
@@ -204,11 +203,20 @@ if(cookie) {
 
 var player = require('./src/resource/player');
 
-router.resource('/players', player); //New routing
+//router.resource('/players', player); //New routing
+
+var route = '/players';
+
+if(player.list) router.get(route, function(req, res) {player.list(req, res, db)});
+if(player.create) router.post(route, function(req, res) {player.create(req, res, db)});
+if(player.read) router.get(route + '/:id', function(req, res) {player.read(req, res, db)});
+if(player.edit) router.get(route + '/:id/edit', function(req, res) {player.read(req, res, db)});
+if(player.update) router.post(route + '/:id', function(req, res) {player.update(req, res, db)});
+if(player.destroy) router.get(route + '/:id/destroy', function(req, res) {player.destroy(req, res, db)});
 
 var migrate = require('./lib/migrate');
 
-console.log("dd");
+
 migrate(db, 'migrations', function(err){
 	console.log("arrive to migrate");
  // var server = new http.Server(function(req, res) {
@@ -220,26 +228,3 @@ migrate(db, 'migrations', function(err){
 
 
 });
-
-/** @function loginRequired
- * A helper function to make sure a user is logged
- * in.  If they are not logged in, the user is
- * redirected to the login page.  If they are,
- * the next request handler is invoked.
- * @param {http.IncomingRequest} req - the request object
- * @param {http.serverResponse} res - the response object
- * @param {function} next - the request handler to invoke if
- * a user is logged in.
- */
-function loginRequired(req, res, next) {
-  // Make sure both a session exists and contains a
-  // username (if so, we have a logged-in user)
-  if(!(req.session && req.session.username)) {
-    // Redirect to the login page
-    res.statusCode = 302;
-    res.setHeader('Location', '/login');
-    return res.end();
-  }
-  // Pass control to the next request handler
-  next(req, res);
-}
