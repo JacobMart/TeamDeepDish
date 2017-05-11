@@ -74,6 +74,7 @@ console.log("arrive multipart");
  * @param {sqlite3.Database} db - the database object
  */
 function read(req, res, db) {
+
   var id = req.params.id;
   db.get("SELECT * FROM players WHERE id=?", [id], function(err, project){
     if(err) {
