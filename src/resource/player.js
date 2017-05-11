@@ -133,6 +133,7 @@ function update(req, res, db) {
  * @param {http.serverResponse} res - the response object
  * @param {sqlite3.Database} db - the database object
  */
+ 
 function destroy(req, res, db) {
   var id = req.params.id;
   db.run("DELETE FROM players WHERE id=?", [id], function(err) {
