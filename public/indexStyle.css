@@ -15,3 +15,9 @@ canvas{
   height: 300px;
   overflow: scroll;
 }
+
+#settingDropDown{
+	float:right;
+	padding-right : 5%;
+}
+

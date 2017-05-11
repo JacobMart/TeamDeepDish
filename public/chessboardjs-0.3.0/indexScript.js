@@ -83,4 +83,5 @@ $('#color').on('change', function() {
     var color = $(this).val();
     socket.emit('color', color);
 });
-});
+
+}); // document ready

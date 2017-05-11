@@ -187,7 +187,9 @@ if(cookie) {
       }
       break;
     case '/index.html':
-      serveFile('public/chessboardjs-0.3.0/index.html', 'text/html', req, res);
+		loginRequired(req, res, function(req,res){
+			serveFile('public/chessboardjs-0.3.0/index.html', 'text/html', req, res);
+		});  
       break;
     case '/chessboard-0.3.0-min.js':
       serveFile('public/chessboardjs-0.3.0/chessboard-0.3.0-min.js', 'text/js', req, res);
@@ -210,12 +212,20 @@ if(cookie) {
     case '/indexScript.js':
      serveFile('public/chessboardjs-0.3.0/indexScript.js', 'text/css', req, res);
      break;
-     case '/chess_game.js':
+    case '/chess_game.js':
       serveFile('public/chess_game.js',"text/js", req, res);
       break;
-	  case '/login_error.html':
+	case '/login_error.html':
       serveFile('public/login_error.html',"text/html", req, res);
       break;
+	case '/logout':
+       // Clear the session by flushing its value
+       res.setHeader("Set-Cookie", ["cryptsession="]);
+       // Redirect back to the index
+       res.statusCode = 302;
+       res.setHeader("Location", "/login.html");
+       res.end();
+       break;
     default:
 		router(req,res);
 		console.log("came to router");
@@ -244,3 +254,26 @@ migrate(db, 'migrations', function(err){
     console.log("listening on port " + PORT);
   });
 });
+
+/** @function loginRequired
+  * A helper function to make sure a user is logged
+  * in.  If they are not logged in, the user is
+  * redirected to the login page.  If they are,
+  * the next request handler is invoked.
+  * @param {http.IncomingRequest} req - the request object
+  * @param {http.serverResponse} res - the response object
+  * @param {function} next - the request handler to invoke if
+  * a user is logged in.
+  */
+function loginRequired(req, res, next) {
+   // Make sure both a session exists and contains a
+   // username (if so, we have a logged-in user)
+   if(!(req.session && req.session.username)) {
+     // Redirect to the login page
+    res.statusCode = 302;
+     res.setHeader('Location', '/login');
+     return res.end();
+   }
+   // Pass control to the next request handler
+   next(req, res);
+}
