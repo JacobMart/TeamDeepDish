@@ -43,27 +43,22 @@ function list(req, res, db) {
  */
 function create(req, res, db) {
 
-   
-//var  jsonData = JSON.stringify({filename:req.body.image.filename,carName:req.body.carName,year:req.body.year,description:req.body.description});
 console.log("arrive multipart");
-
+ // Using multipart library to succeffuly render the  request from the register.html
   multipart(req, res, function(req, res){	
 	var salt = encryption.salt();
 	console.log(req.body);
-		//var form = new formidable.IncomingForm();
-		var username = req.body.username;
-        var password = req.body.password;
-		// req.session.reset();
-			//  if(err) return res.sendStatus(500);
-			  console.log("username: ",username," Pwrd", password);
-			  db.run("INSERT INTO players (username,cryptedPassword,salt,wins,losses) values (?,?,?,?,?)",
-			  username,
-			  encryption.digest(password + salt),
-			  salt,0,0, function(err, user) {
-			 // if(err) {console.log(err); return res.render('login/signup_error', {message: "Username is already taken. Try other username.", user: req.user});}
-			 // else { return res.render('login/login', {message: "Account has been created, Please login now."});}
-			  return res.redirect('/login.html');
-			});
+	var username = req.body.username;
+	var password = req.body.password;
+	  console.log("username: ",username," Pwrd", password);
+	  db.run("INSERT INTO players (username,cryptedPassword,salt,wins,losses) values (?,?,?,?,?)",
+	  username,
+	  encryption.digest(password + salt),
+	  salt,0,0, function(err, user) {
+	 // if(err) {console.log(err); return res.render('login/signup_error', {message: "Username is already taken. Try other username.", user: req.user});}
+	 // else { return res.render('login/login', {message: "Account has been created, Please login now."});}
+	  return res.redirect('/login.html');
+	});
  });// end of mulitipart			
 }
 

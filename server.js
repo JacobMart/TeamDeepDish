@@ -47,7 +47,6 @@ router.use(express.static('public'));
 
 //serving image
 router.get('/images/:filename',function(req, res){
-	//console.log(req.param.filename);
     fs.readFile('images/' + req.params.filename, function(err, body){
       res.setHeader('Content-Type', 'image/png');
       res.end(body);
@@ -134,10 +133,13 @@ if(cookie) {
             var username = req.body.username;
             var password = req.body.password;
             // Evaluate the username/password
+			// Reading from the sqlite database
 				db.get("SELECT * FROM players WHERE username = ?", username, (err, user) => {
 					if(err) return res.render('login/login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 					console.log(user);
 					if(!user) {
+						// if the user is not in the database
+						// ill be implementing ejs later
 						// res.render('login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 						 //res.redirect('/login.html');
 						 console.log("no user");
@@ -146,8 +148,9 @@ if(cookie) {
 						res.end();	
 					}
 					else{
+						//Patron with the username exists in the database. But wrong password
 						if(user.cryptedPassword != encryption.digest(password + user.salt)) 
-						{
+						{	
 							//return res.render('login/login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 							//return res.redirect('/login.html');
 							res.statusCode = 302;
@@ -155,6 +158,7 @@ if(cookie) {
 							res.end();
 						}
 						else{
+							// user correctly entered the username and password
 							req.session.user_id = user.id;
 							 // matching password & username - log the user in
 							// by creating the session object
@@ -172,9 +176,9 @@ if(cookie) {
 							//return res.redirect('/index.html');
 						}
 					}	
-				});		
-          }); // end of urlencode
-        }
+				});	// db	
+          }); //  urlencode
+        } //if
         break;
     case '/register.html':
       if (req.method == 'GET') {
@@ -191,8 +195,6 @@ if(cookie) {
     case '/chessboard-0.3.0-min.css':
       serveFile('public/chessboardjs-0.3.0/css/chessboard-0.3.0-min.css', 'text/css', req, res);
       break;
-  //  case '/socket.io/socket.io.js':
-  //      serverFile('');
     case '/login.css':
       serveFile('public/login.css', 'text/css', req, res);
       break;
@@ -218,14 +220,12 @@ if(cookie) {
 		router(req,res);
 		console.log("came to router");
   }
-
 }
-
 
 var player = require('./src/resource/player');
 
-//router.resource('/players', player); //New routing
 
+// if the incoming request comes with players
 var route = '/players';
 
 if(player.list) router.get(route, function(req, res) {player.list(req, res, db)});
@@ -237,15 +237,10 @@ if(player.destroy) router.get(route + '/:id/destroy', function(req, res) {player
 
 var migrate = require('./lib/migrate');
 
-
 migrate(db, 'migrations', function(err){
 	console.log("arrive to migrate");
- // var server = new http.Server(function(req, res) {
- //   router.route(req, res);
- // });
-  server.listen(PORT, function(){
+	// port
+	server.listen(PORT, function(){
     console.log("listening on port " + PORT);
   });
-
-
 });
