@@ -11,19 +11,18 @@
   </head>
   <body>
 
-    <div id="registerForm" class="container-fluid" style="
-        margin-top: 25%;
-        width: 26%;">
+    <div id="registerForm" class="container-fluid"  style="margin-top: 25%;width: 26%;">
       <div class="row vertical-align" style="
         padding: 20px;">
-        <form>
+       <form action="/players" method="POST" enctype="multipart/form-data">
           <h3>Registration</h3>
           Username:
-          <input type="text" class="form-control" name="playername" style="
-            width=100%;">
-          <br>Password:
-          <input type="text" class="form-control" name="password"  style="
-            width=100%;">
+          <input type="text" class="form-control" name="username" style="width=100%;">
+			<br>Password:
+          <input type="password" class="form-control" name="password" id="password"  style="width=100%;">
+			<br>Confirm Password:
+          <input type="password" class="form-control" name="#confirm_password" id="confirm_password"  style="width=100%;">	
+			<span id='message'></span>
           <br><input type="submit" id="newUser" class="btn btn-warning" value="Create Account">
         </form>
       </div>

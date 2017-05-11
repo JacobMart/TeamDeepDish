@@ -35,11 +35,7 @@ io.on('connection', function(socket) {
             color: color
         });
     });
-    socket.on('newBoard', function(text) {
-      io.emit('newBoard', {
-        text: text
-      })
-    });
+
     socket.on('color', function(newColor) {
         color = newColor;
     });
@@ -164,9 +160,7 @@ if(cookie) {
     case '/register.html':
       if (req.method == 'GET') {
         serveFile('public/register.html', 'text/html', req, res);
-      }
-      else if (req.method == 'POST') {
-        //Create new user
+		console.log('arrive to get of register file');
       }
       break;
     case '/index.html':
@@ -200,6 +194,7 @@ if(cookie) {
       break;
     default:
 		router(req,res);
+		console.log("came to router");
   }
 
 }
