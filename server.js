@@ -137,12 +137,12 @@ if(cookie) {
 				db.get("SELECT * FROM players WHERE username = ?", username, (err, user) => {
 					if(err) return res.render('login/login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 					console.log(user);
-					if( user.length > 0) {
-						//return res.render('login/login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
+					if(!user) {
+						// res.render('login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 						 //res.redirect('/login.html');
 						 console.log("no user");
 						res.statusCode = 302;
-						res.setHeader("Location", "/login.html");
+						res.setHeader("Location", "/login_error.html");
 						res.end();	
 					}
 					else{
@@ -151,7 +151,7 @@ if(cookie) {
 							//return res.render('login/login_error', {message: "Username/Password not found.  Please try again.", user: req.user});
 							//return res.redirect('/login.html');
 							res.statusCode = 302;
-							res.setHeader("Location", "/login.html");
+							res.setHeader("Location", "/login_error.html");
 							res.end();
 						}
 						else{
@@ -210,6 +210,9 @@ if(cookie) {
      break;
      case '/chess_game.js':
       serveFile('public/chess_game.js',"text/js", req, res);
+      break;
+	  case '/login_error.html':
+      serveFile('public/login_error.html',"text/html", req, res);
       break;
     default:
 		router(req,res);
